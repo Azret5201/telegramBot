@@ -30,11 +30,11 @@
             <button class="btn btn-primary" type="submit">Сохранить   </button>
         </form>
 
-            <form action="{{ route('setting.setwebhook') }}" id="setWebHook" method="post" style="display: none">
+            <form action="{{ route('setting.setWebhook') }}" id="setWebHook" method="post" style="display: none">
                 @csrf
                 <input type="hidden" name="url" value="{{ $url_callback_bot ?? '' }}">
             </form>
-            <form action="{{ route('setting.getwebhookinfo') }}" id="getWebHookInfo" method="post" style="display: none">
+            <form action="{{ route('setting.getWebhookInfo') }}" id="getWebHookInfo" method="post" style="display: none">
                 @csrf
             </form>
     </div>
