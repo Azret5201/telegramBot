@@ -2,7 +2,10 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Http;
+use Telegram\Bot\Laravel\Facades\Telegram;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -26,6 +29,29 @@ class Handler extends ExceptionHandler
         'password',
         'password_confirmation',
     ];
+
+    protected $telegram;
+
+    public function __construct(Container $container, \App\Helpers\Telegram $telegram)
+    {
+        parent::__construct($container);
+        $this->telegram = $telegram;
+    }
+    /**
+     * Register the exception handling callbacks for the application.
+     *
+     * @return void
+     */
+    public function report(Throwable $e)
+    {
+        $data = [
+            'desc' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ];
+        $this->telegram->sendMessage(533372516, (string)view('report', $data));
+
+    }
 
     /**
      * Register the exception handling callbacks for the application.

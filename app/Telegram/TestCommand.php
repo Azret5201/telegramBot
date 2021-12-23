@@ -3,8 +3,11 @@
 
 namespace App\Telegram;
 
+use Illuminate\Support\Facades\Http;
 use Telegram\Bot\Commands\Command;
 use Telegram\Bot\Actions;
+use Telegram\Bot\Keyboard\Keyboard;
+use Telegram\Bot\Laravel\Facades\Telegram;
 
 /**
  * Class HelpCommand.
@@ -16,10 +19,17 @@ class TestCommand extends Command
      */
     protected $name = 'test';
 
-    /**
-     * @var array Command Aliases
-     */
-    protected $aliases = ['listcommands'];
+    protected $telegram;
+
+    public function __construct(\App\Helpers\Telegram  $telegram)
+    {
+        $this->telegram = $telegram;
+    }
+
+//    /**
+//     * @var array Command Aliases
+//     */
+//    protected $aliases = ['listcommands'];
 
     /**
      * @var string Command Description
@@ -31,15 +41,25 @@ class TestCommand extends Command
      */
     public function handle()
     {
-        $commands = $this->telegram->getCommands();
+       $this->replyWithChatAction(['action' => Actions::TYPING]);
+       $telegramUser = Telegram::getWebhookUpdates()['message'];
+       //Сделать проверку на налиие имени
+        $text = sprintf('%s: %s'.PHP_EOL, 'Ваш номер чата', $telegramUser['from']['id']);
 
-        $text = '';
-        foreach ($commands as $name => $handler) {
-            /* @var Command $handler */
-            $text .= sprintf('/%s - %s' . PHP_EOL, $name, $handler->getDescription());
-        }
+        $response = Telegram::sendMessage([
+            'chat_id' => $telegramUser['from']['id'],
+            'text' => 'Hello World',
+            'reply_markup' => json_encode([
+                'keyboard '=>[
+                    [
+                        ['text'=>'Register'],['text'=>'Войти']
+                    ],
+                ]
+            ])
+        ]);
 
         $this->replyWithMessage(compact('text'));
+
     }
 }
 
